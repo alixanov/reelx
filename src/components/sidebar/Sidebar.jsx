@@ -275,7 +275,7 @@ const Navigation = () => {
           ))}
         </ul>
         <a
-          href="https://x.com/memewizzard_sol"
+          href="https://x.com/"
           target="_blank"
           rel="noopener noreferrer"
           style={hoveredLink === 'follow-us' ? hoverLinkStyle : linkStyle}

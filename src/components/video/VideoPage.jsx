@@ -1,48 +1,141 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import VideoData from '../data/VideoData';
+import ContentLoader from 'react-content-loader';
+
+// Gothic Color Palette
+const colors = {
+  background: {
+    primary: '#0A0A0A',
+    secondary: '#131313',
+    tertiary: '#1C1C1C',
+  },
+  accent: {
+    primary: '#8B0000',
+    secondary: '#4A0404',
+    highlight: '#B30000',
+  },
+  text: {
+    primary: '#C0C0C0',
+    secondary: '#767676',
+    highlight: '#DEDEDE',
+  },
+  border: {
+    primary: '#333',
+    highlight: '#4A0404',
+  },
+};
+
+// Skeleton Loader Component
+const VideoPageSkeleton = ({ isMobile }) => (
+  <div
+    style={{
+      maxWidth: '1200px',
+      width: '100%',
+      display: 'flex',
+      flexDirection: isMobile ? 'column' : 'row',
+      gap: '24px',
+    }}
+  >
+    <div style={{ flexBasis: isMobile ? '100%' : '850px', flexGrow: 1 }}>
+      {/* Video Player */}
+      <ContentLoader
+        speed={2}
+        width={isMobile ? 300 : 850}
+        height={isMobile ? 168 : 478}
+        viewBox="0 0 850 478"
+        backgroundColor={colors.background.tertiary}
+        foregroundColor={colors.border.primary}
+      >
+        <rect x="0" y="0" rx="6" ry="6" width="850" height="478" />
+      </ContentLoader>
+      {/* Video Info */}
+      <ContentLoader
+        speed={2}
+        width={isMobile ? 300 : 850}
+        height={200}
+        viewBox="0 0 850 200"
+        backgroundColor={colors.background.tertiary}
+        foregroundColor={colors.border.primary}
+        style={{ marginTop: '16px' }}
+      >
+        <rect x="0" y="0" rx="6" ry="6" width="850" height="200" />
+        <rect x="16" y="16" rx="4" ry="4" width="600" height="20" />
+        <rect x="16" y="44" rx="4" ry="4" width="200" height="14" />
+        <rect x="650" y="44" rx="4" ry="4" width="150" height="14" />
+        <rect x="16" y="76" rx="4" ry="4" width="750" height="100" />
+      </ContentLoader>
+      {/* Comments */}
+      <ContentLoader
+        speed={2}
+        width={isMobile ? 300 : 850}
+        height={120}
+        viewBox="0 0 850 120"
+        backgroundColor={colors.background.tertiary}
+        foregroundColor={colors.border.primary}
+        style={{ marginTop: '16px' }}
+      >
+        <rect x="0" y="0" rx="6" ry="6" width="850" height="120" />
+        <rect x="16" y="16" rx="4" ry="4" width="200" height="16" />
+        <circle cx="36" cy="64" r="20" />
+        <rect x="64" y="56" rx="6" ry="6" width="750" height="24" />
+      </ContentLoader>
+    </div>
+    <div style={{ flexBasis: isMobile ? '100%' : '300px', flexGrow: 1 }}>
+      {/* Related Videos */}
+      <ContentLoader
+        speed={2}
+        width={isMobile ? 300 : 300}
+        height={470}
+        viewBox="0 0 300 470"
+        backgroundColor={colors.background.tertiary}
+        foregroundColor={colors.border.primary}
+      >
+        <rect x="0" y="0" rx="4" ry="4" width="200" height="16" />
+        {Array(5)
+          .fill()
+          .map((_, i) => (
+            <React.Fragment key={i}>
+              <rect x="8" y={40 + i * 90} rx="6" ry="6" width="168" height="94" />
+              <rect x="184" y={40 + i * 90} rx="4" ry="4" width="100" height="14" />
+              <rect x="184" y={60 + i * 90} rx="4" ry="4" width="80" height="12" />
+              <rect x="184" y={78 + i * 90} rx="4" ry="4" width="80" height="12" />
+            </React.Fragment>
+          ))}
+      </ContentLoader>
+    </div>
+  </div>
+);
 
 const VideoPage = () => {
   const { id } = useParams();
   const [video, setVideo] = useState(null);
   const [relatedVideos, setRelatedVideos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const currentVideo = VideoData.find((v) => v.id === id);
-    setVideo(currentVideo);
+    const loadVideo = async () => {
+      setIsLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate async load
+      const currentVideo = VideoData.find((v) => v.id === id);
+      setVideo(currentVideo);
 
-    if (currentVideo) {
-      // Save to localStorage for History
-      const history = JSON.parse(localStorage.getItem('videoHistory')) || [];
-      if (!history.find((v) => v.id === currentVideo.id)) {
-        history.unshift(currentVideo);
-        localStorage.setItem('videoHistory', JSON.stringify(history));
+      if (currentVideo) {
+        // Save to localStorage for History
+        const history = JSON.parse(localStorage.getItem('videoHistory')) || [];
+        if (!history.find((v) => v.id === currentVideo.id)) {
+          history.unshift(currentVideo);
+          localStorage.setItem('videoHistory', JSON.stringify(history));
+        }
+
+        // Set related videos
+        const related = VideoData.filter((v) => v.id !== id).slice(0, 5);
+        setRelatedVideos(related);
       }
-
-      // Set related videos
-      const related = VideoData.filter((v) => v.id !== id).slice(0, 5);
-      setRelatedVideos(related);
-    }
+      setIsLoading(false);
+    };
+    loadVideo();
   }, [id]);
-
-  if (!video) {
-    return (
-      <div
-        style={{
-          padding: '20px',
-          textAlign: 'center',
-          backgroundColor: '#e8f5e9',
-          minHeight: '100vh',
-          fontFamily: 'var(--font-primary)',
-          color: '#666666',
-          fontSize: '16px',
-          fontWeight: '400',
-        }}
-      >
-        Video not found
-      </div>
-    );
-  }
 
   const formatViews = (viewCount) => {
     return viewCount;
@@ -53,12 +146,54 @@ const VideoPage = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          padding: isMobile ? '14px' : '20px',
+          minHeight: '100vh',
+          fontFamily: 'var(--font-primary)',
+          background: '#121212',
+          boxShadow: `inset 0 0 15px ${colors.accent.secondary}`,
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <VideoPageSkeleton isMobile={isMobile} />
+      </div>
+    );
+  }
+
+  if (!video) {
+    return (
+      <div
+        style={{
+          padding: isMobile ? '14px' : '20px',
+          textAlign: 'center',
+          background: '#121212',
+          minHeight: '100vh',
+          fontFamily: 'var(--font-primary)',
+          color: colors.text.secondary,
+          fontSize: isMobile ? '14px' : '16px',
+          fontWeight: '400',
+          boxShadow: `inset 0 0 15px ${colors.accent.secondary}`,
+        }}
+      >
+        No soul found for this video.
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
-        padding: '20px',
+        padding: isMobile ? '14px' : '20px',
         minHeight: '100vh',
         fontFamily: 'var(--font-primary)',
+        background: '#121212',
+        boxShadow: `inset 0 0 15px ${colors.accent.secondary}`,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -69,14 +204,13 @@ const VideoPage = () => {
           maxWidth: '1200px',
           width: '100%',
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: isMobile ? 'column' : 'row',
           gap: '24px',
-          flexWrap: 'wrap',
         }}
       >
         <div
           style={{
-            flexBasis: '850px',
+            flexBasis: isMobile ? '100%' : '850px',
             flexGrow: 1,
           }}
         >
@@ -84,10 +218,11 @@ const VideoPage = () => {
             style={{
               width: '100%',
               aspectRatio: '16/9',
-              backgroundColor: '#000000',
-              borderRadius: '12px',
+              backgroundColor: '#000',
+              borderRadius: '6px',
               marginBottom: '16px',
               overflow: 'hidden',
+              border: `1px solid ${colors.border.primary}`,
             }}
           >
             <iframe
@@ -103,20 +238,22 @@ const VideoPage = () => {
 
           <div
             style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
+              backgroundColor: colors.background.tertiary,
+              borderRadius: '6px',
               padding: '16px',
               marginBottom: '16px',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              boxShadow: `inset 0 0 5px rgba(0, 0, 0, 0.5), 0 0 5px ${colors.accent.secondary}`,
+              border: `1px solid ${colors.border.primary}`,
             }}
           >
             <h1
               style={{
-                fontSize: '20px',
+                fontSize: isMobile ? '18px' : '20px',
                 fontWeight: '600',
-                color: '#333333',
+                color: colors.text.primary,
                 marginBottom: '8px',
-                fontFamily: 'var(--font-primary)',
+                fontFamily: 'var(--font-heading)',
+                textShadow: `0 0 4px ${colors.accent.secondary}`,
               }}
             >
               {video.snippet.title}
@@ -127,14 +264,14 @@ const VideoPage = () => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 marginBottom: '16px',
-                fontSize: '14px',
-                color: '#666666',
+                fontSize: isMobile ? '12px' : '14px',
+                color: colors.text.secondary,
                 fontWeight: '400',
                 fontFamily: 'var(--font-primary)',
               }}
             >
               <div>
-                <span style={{ fontWeight: '600', color: '#333333' }}>
+                <span style={{ fontWeight: '600', color: colors.text.primary }}>
                   {video.snippet.channelTitle}
                 </span>
               </div>
@@ -147,12 +284,13 @@ const VideoPage = () => {
             <div
               style={{
                 padding: '12px',
-                backgroundColor: '#e8f5e9',
-                borderRadius: '12px',
-                fontSize: '14px',
-                color: '#666666',
+                backgroundColor: colors.background.secondary,
+                borderRadius: '6px',
+                fontSize: isMobile ? '12px' : '14px',
+                color: colors.text.secondary,
                 fontWeight: '400',
                 fontFamily: 'var(--font-primary)',
+                boxShadow: `0 0 5px ${colors.accent.secondary}`,
               }}
             >
               <p>{video.snippet.description}</p>
@@ -161,22 +299,24 @@ const VideoPage = () => {
 
           <div
             style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
+              backgroundColor: colors.background.tertiary,
+              borderRadius: '6px',
               padding: '16px',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              boxShadow: `inset 0 0 5px rgba(0, 0, 0, 0.5), 0 0 5px ${colors.accent.secondary}`,
+              border: `1px solid ${colors.border.primary}`,
             }}
           >
             <h3
               style={{
-                fontSize: '16px',
+                fontSize: isMobile ? '14px' : '16px',
                 fontWeight: '600',
-                color: '#333333',
+                color: colors.text.primary,
                 marginBottom: '16px',
-                fontFamily: 'var(--font-primary)',
+                fontFamily: 'var(--font-heading)',
+                textShadow: `0 0 4px ${colors.accent.secondary}`,
               }}
             >
-              Comments
+              Cursed Whispers
             </h3>
             <div
               style={{
@@ -190,60 +330,68 @@ const VideoPage = () => {
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  backgroundColor: '#c8e6c9',
+                  backgroundColor: colors.background.secondary,
                   marginRight: '12px',
+                  boxShadow: `0 0 5px ${colors.accent.secondary}`,
                 }}
               ></div>
               <input
                 type="text"
-                placeholder="Add a comment..."
+                placeholder="Add a cursed whisper..."
                 style={{
                   flex: 1,
                   padding: '8px 12px',
-                  borderRadius: '12px',
-                  border: '1px solid #c8e6c9',
-                  fontSize: '14px',
+                  borderRadius: '6px',
+                  border: `1px solid ${colors.border.primary}`,
+                  fontSize: isMobile ? '12px' : '14px',
                   fontWeight: '400',
                   fontFamily: 'var(--font-primary)',
-                  color: '#333333',
-                  backgroundColor: '#ffffff',
+                  color: colors.text.primary,
+                  backgroundColor: colors.background.tertiary,
                   outline: 'none',
-                  transition: 'border-color 0.3s ease',
+                  transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
                 }}
-                onFocus={(e) => (e.target.style.borderColor = '#dcedc8')}
-                onBlur={(e) => (e.target.style.borderColor = '#c8e6c9')}
+                onFocus={(e) => {
+                  e.target.style.borderColor = colors.accent.primary;
+                  e.target.style.boxShadow = `0 0 5px ${colors.accent.primary}`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = colors.border.primary;
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
             <div
               style={{
-                color: '#666666',
+                color: colors.text.secondary,
                 textAlign: 'center',
-                fontSize: '14px',
+                fontSize: isMobile ? '12px' : '14px',
                 fontWeight: '400',
                 fontFamily: 'var(--font-primary)',
               }}
             >
-              No comments yet
+              No whispers haunt this place yet.
             </div>
           </div>
         </div>
 
         <div
           style={{
-            flexBasis: '300px',
+            flexBasis: isMobile ? '100%' : '300px',
             flexGrow: 1,
           }}
         >
           <h3
             style={{
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '600',
-              color: '#333333',
+              color: colors.text.primary,
               marginBottom: '12px',
-              fontFamily: 'var(--font-primary)',
+              fontFamily: 'var(--font-heading)',
+              textShadow: `0 0 4px ${colors.accent.secondary}`,
             }}
           >
-            Related Videos
+            Kindred Souls
           </h3>
           {relatedVideos.map((relVideo) => (
             <Link
@@ -255,19 +403,22 @@ const VideoPage = () => {
                 style={{
                   display: 'flex',
                   marginBottom: '12px',
-                  backgroundColor: '#ffffff',
-                  borderRadius: '12px',
+                  backgroundColor: colors.background.tertiary,
+                  borderRadius: '6px',
                   padding: '8px',
-                  transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.4s ease',
+                  boxShadow: `inset 0 0 5px rgba(0, 0, 0, 0.5), 0 0 5px ${colors.accent.secondary}`,
+                  border: `1px solid ${colors.border.primary}`,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#dcedc8';
-                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(200, 230, 201, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = `0 0 12px ${colors.accent.primary}, inset 0 0 8px ${colors.accent.primary}`;
+                  e.currentTarget.style.borderColor = colors.accent.primary;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#ffffff';
-                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = `inset 0 0 5px rgba(0, 0, 0, 0.5), 0 0 5px ${colors.accent.secondary}`;
+                  e.currentTarget.style.borderColor = colors.border.primary;
                 }}
               >
                 <div
@@ -276,33 +427,35 @@ const VideoPage = () => {
                     height: '94px',
                     backgroundColor: '#000',
                     marginRight: '8px',
-                    borderRadius: '8px',
+                    borderRadius: '6px',
                     backgroundImage: `url(${relVideo.snippet.thumbnails.medium.url})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     flexShrink: 0,
+                    border: `1px solid ${colors.border.primary}`,
                   }}
                 ></div>
                 <div>
                   <div
                     style={{
-                      fontSize: '14px',
+                      fontSize: isMobile ? '12px' : '14px',
                       fontWeight: '600',
-                      color: '#333333',
+                      color: colors.text.primary,
                       marginBottom: '4px',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      fontFamily: 'var(--font-primary)',
+                      fontFamily: 'var(--font-heading)',
+                      textShadow: `0 0 4px ${colors.accent.secondary}`,
                     }}
                   >
                     {relVideo.snippet.title}
                   </div>
                   <div
                     style={{
-                      fontSize: '12px',
-                      color: '#666666',
+                      fontSize: isMobile ? '10px' : '12px',
+                      color: colors.text.secondary,
                       fontWeight: '400',
                       fontFamily: 'var(--font-primary)',
                     }}
@@ -311,8 +464,8 @@ const VideoPage = () => {
                   </div>
                   <div
                     style={{
-                      fontSize: '12px',
-                      color: '#666666',
+                      fontSize: isMobile ? '10px' : '12px',
+                      color: colors.text.secondary,
                       fontWeight: '400',
                       fontFamily: 'var(--font-primary)',
                     }}

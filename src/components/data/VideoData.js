@@ -188,6 +188,132 @@ const VideoData = [
       commentCount: '2.8K',
     },
   },
+  {
+    id: 'XDfkckurtmE',
+    snippet: {
+      title: 'Memecoin Mania: What’s Driving the Hype in 2025?',
+      channelTitle: 'CryptoBuzz',
+      thumbnails: {
+        medium: {
+          url: 'https://i.ytimg.com/vi/XDfkckurtmE/mqdefault.jpg',
+          width: 320,
+          height: 180,
+        },
+      },
+      publishedAt: '2025-02-20T12:00:00Z',
+      description: 'Explore the factors fueling the memecoin craze in 2025, from social media trends to celebrity endorsements and market speculation.',
+    },
+    statistics: {
+      viewCount: '95K',
+      likeCount: '11K',
+      commentCount: '2.2K',
+    },
+  },
+  {
+    id: 'fnrOklisTjg',
+    snippet: {
+      title: 'Top 5 Undervalued Memecoins Ready to Moon',
+      channelTitle: 'CoinHunter',
+      thumbnails: {
+        medium: {
+          url: 'https://i.ytimg.com/vi/fnrOklisTjg/mqdefault.jpg',
+          width: 320,
+          height: 180,
+        },
+      },
+      publishedAt: '2025-02-15T14:30:00Z',
+      description: 'Uncover five hidden gem memecoins with strong communities and innovative features that could see massive gains in 2025.',
+    },
+    statistics: {
+      viewCount: '80K',
+      likeCount: '9.5K',
+      commentCount: '1.7K',
+    },
+  },
+  {
+    id: 'pvjzva-q58Y',
+    snippet: {
+      title: 'The Future of Memecoins: Utility vs. Hype',
+      channelTitle: 'BlockchainVision',
+      thumbnails: {
+        medium: {
+          url: 'https://i.ytimg.com/vi/pvjzva-q58Y/mqdefault.jpg',
+          width: 320,
+          height: 180,
+        },
+      },
+      publishedAt: '2025-02-10T11:00:00Z',
+      description: 'Can memecoins evolve beyond hype to offer real-world utility? This video dives into the potential for memecoins to integrate with DeFi and NFTs.',
+    },
+    statistics: {
+      viewCount: '115K',
+      likeCount: '13K',
+      commentCount: '2.9K',
+    },
+  },
+  {
+    id: 'Hz2F_S3Tl0Y',
+    snippet: {
+      title: 'How Memecoins Are Changing Crypto Culture',
+      channelTitle: 'CryptoCulture',
+      thumbnails: {
+        medium: {
+          url: 'https://i.ytimg.com/vi/Hz2F_S3Tl0Y/mqdefault.jpg',
+          width: 320,
+          height: 180,
+        },
+      },
+      publishedAt: '2025-02-05T09:00:00Z',
+      description: 'Memecoins are more than just tokens; they’re shaping a new era of community-driven crypto culture. Learn how they’re influencing the market.',
+    },
+    statistics: {
+      viewCount: '70K',
+      likeCount: '8K',
+      commentCount: '1.3K',
+    },
+  },
+  {
+    id: 'Crr7j0udrc4',
+    snippet: {
+      title: 'Pepe Coin: The Meme That Became a Movement',
+      channelTitle: 'MemeMaster',
+      thumbnails: {
+        medium: {
+          url: 'https://i.ytimg.com/vi/Crr7j0udrc4/mqdefault.jpg',
+          width: 320,
+          height: 180,
+        },
+      },
+      publishedAt: '2025-02-01T16:00:00Z',
+      description: 'Pepe Coin started as a meme but grew into a cultural phenomenon. This video explores its rise and what’s next for the frog-themed token.',
+    },
+    statistics: {
+      viewCount: '140K',
+      likeCount: '17K',
+      commentCount: '3.5K',
+    },
+  },
+  {
+    id: 'FzcfZyEhOoI',
+    snippet: {
+      title: 'Avoid These Memecoin Mistakes in 2025',
+      channelTitle: 'CryptoMentor',
+      thumbnails: {
+        medium: {
+          url: 'https://i.ytimg.com/vi/FzcfZyEhOoI/mqdefault.jpg',
+          width: 320,
+          height: 180,
+        },
+      },
+      publishedAt: '2025-01-28T13:00:00Z',
+      description: 'Don’t lose your investment! This guide highlights the biggest memecoin mistakes beginners make and how to avoid them in 2025.',
+    },
+    statistics: {
+      viewCount: '100K',
+      likeCount: '12.5K',
+      commentCount: '2.4K',
+    },
+  },
 ];
 
 export default VideoData;

@@ -1,31 +1,81 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import VideoData from '../data/VideoData';
 
-// Styled components for better organization
 const HotContainer = styled.div`
   padding: 20px;
-  background-color: #f5f5f5;
   min-height: 100vh;
+  font-family: var(--font-primary);
+`;
+
+const HotHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 16px 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #c8e6c9;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+`;
+
+const HotTitle = styled.h1`
+  font-size: 24px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 16px;
+  font-family: var(--font-primary);
+
+  @media (min-width: 768px) {
+    margin-bottom: 0;
+  }
+`;
+
+const FilterButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const FilterButton = styled.button`
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid #c8e6c9;
+  background-color: ${props => props.active ? '#c8e6c9' : '#ffffff'};
+  color: ${props => props.active ? '#333333' : '#666666'};
+  font-size: 14px;
+  font-weight: 400;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: ${props => props.active ? '#c8e6c9' : '#dcedc8'};
+  }
 `;
 
 const VideoGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   padding: 0 10px;
 `;
 
 const VideoCard = styled.div`
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
   &:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(200, 230, 201, 0.2);
   }
 `;
 
@@ -33,140 +83,79 @@ const Thumbnail = styled.img`
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
+  background-color: #000;
 `;
 
 const VideoInfo = styled.div`
-  padding: 10px;
-  color: #000000;
+  padding: 12px;
 `;
 
 const Title = styled.div`
   font-size: 16px;
   font-weight: 600;
-  color: #000000;
-  margin-bottom: 5px;
+  color: #333333;
+  margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.4;
+  height: 44px;
+  font-family: var(--font-primary);
 `;
 
 const Channel = styled.div`
   font-size: 14px;
   color: #666666;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  font-weight: 400;
+  font-family: var(--font-primary);
 `;
 
 const Meta = styled.div`
   font-size: 12px;
-  color: #888888;
+  color: #666666;
   display: flex;
-  gap: 10px;
+  gap: 6px;
+  font-weight: 400;
+  font-family: var(--font-primary);
 `;
 
 const Loading = styled.div`
   text-align: center;
-  padding: 20px;
+  padding: 30px;
   color: #666666;
-  font-size: 16px;
-`;
-
-const HotHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 0 10px;
-`;
-
-const HotTitle = styled.h1`
-  font-size: 24px;
-  color: #333;
-`;
-
-const FilterButtons = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const FilterButton = styled.button`
-  padding: 8px 16px;
-  border: none;
-  border-radius: 20px;
-  background-color: ${props => props.active ? '#ff0000' : '#e0e0e0'};
-  color: ${props => props.active ? '#fff' : '#333'};
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: ${props => props.active ? '#ff3333' : '#d0d0d0'};
-  }
+  font-size: 14px;
+  font-weight: 400;
+  font-family: var(--font-primary);
 `;
 
 // Enhanced mock data generator with popularity metrics
-const generateHotVideos = (count) => {
-  const videos = [];
-  const now = new Date();
-
-  for (let i = 1; i <= count; i++) {
-    const isTrending = i % 3 === 0; // Every 3rd video is trending
-    const isNew = i % 4 === 0; // Every 4th video is new
-
-    const daysOld = i % 7;
-    const hoursOld = i % 24;
-
-    const id = `hot${i}`;
+const generateHotVideos = () => {
+  return VideoData.map((video, index) => {
+    const isTrending = index % 3 === 0;
     const viewCount = isTrending
-      ? `${Math.floor(Math.random() * 1000) + 500}K`
-      : `${Math.floor(Math.random() * 500) + 50}K`;
+      ? `${Math.floor(Math.random() * 500) + 500}K`
+      : video.statistics.viewCount;
 
-    const publishedAt = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - daysOld,
-      now.getHours() - hoursOld
-    ).toISOString();
-
-    videos.push({
-      id,
-      snippet: {
-        title: `${isTrending ? '🔥 ' : ''}${isNew ? '🆕 ' : ''}Memecoin Video #${id}`,
-        channelTitle: `Creator${i % 5 || 1}`,
-        thumbnails: {
-          medium: {
-            url: `https://i.ytimg.com/vi/${['dQw4w9WgXcQ', '9bZkp7q19f0', 'TGjB2D6hQ8U'][i % 3]}/mqdefault.jpg`,
-          },
-        },
-        publishedAt,
-      },
+    return {
+      ...video,
+      trending: isTrending ? 1 : 0,
       statistics: {
-        viewCount,
-        likeCount: `${Math.floor(Math.random() * 100) + (isTrending ? 50 : 10)}K`,
+        ...video.statistics,
+        viewCount: viewCount,
       },
-      trending: isTrending,
-      new: isNew,
-    });
-  }
-
-  // Sort by trending first, then by views, then by newest
-  return videos.sort((a, b) => {
-    if (a.trending !== b.trending) return b.trending - a.trending;
-    if (parseInt(a.statistics.viewCount) !== parseInt(b.statistics.viewCount)) {
-      return parseInt(b.statistics.viewCount) - parseInt(a.statistics.viewCount);
-    }
-    return new Date(b.snippet.publishedAt) - new Date(a.snippet.publishedAt);
+    };
   });
 };
 
 const Hot = () => {
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [filter, setFilter] = useState('trending'); // 'trending', 'newest', 'popular'
+  const [filter, setFilter] = useState('trending');
   const loaderRef = useRef(null);
 
-  // Filter videos based on selection
   const filteredVideos = React.useMemo(() => {
     if (!videos.length) return [];
 
@@ -174,41 +163,47 @@ const Hot = () => {
 
     switch (filter) {
       case 'newest':
-        return sorted.sort((a, b) =>
-          new Date(b.snippet.publishedAt) - new Date(a.snippet.publishedAt)
+        return sorted.sort(
+          (a, b) => new Date(b.snippet.publishedAt) - new Date(a.snippet.publishedAt)
         );
       case 'popular':
         return sorted.sort((a, b) =>
-          parseInt(b.statistics.viewCount) - parseInt(a.statistics.viewCount)
+          parseInt(b.statistics.viewCount.replace('K', '')) -
+          parseInt(a.statistics.viewCount.replace('K', ''))
         );
       case 'trending':
       default:
         return sorted.sort((a, b) => {
           if (a.trending !== b.trending) return b.trending - a.trending;
-          return parseInt(b.statistics.viewCount) - parseInt(a.statistics.viewCount);
+          return (
+            parseInt(b.statistics.viewCount.replace('K', '')) -
+            parseInt(a.statistics.viewCount.replace('K', ''))
+          );
         });
     }
   }, [videos, filter]);
 
-  // Simulate API call with mock data
   const fetchVideos = async () => {
     setIsLoading(true);
-    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 800));
-    const hotVideos = generateHotVideos(24); // Fetch 24 hot videos
+    const hotVideos = generateHotVideos();
     setVideos(hotVideos);
     setIsLoading(false);
   };
 
-  // Initial fetch
   useEffect(() => {
     fetchVideos();
   }, []);
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   return (
     <HotContainer>
       <HotHeader>
-        <HotTitle>🔥 Hot Memecoin Videos</HotTitle>
+        <HotTitle>Hot Videos</HotTitle>
         <FilterButtons>
           <FilterButton
             active={filter === 'trending'}
@@ -242,15 +237,17 @@ const Hot = () => {
               <Thumbnail
                 src={video.snippet.thumbnails.medium.url}
                 alt={video.snippet.title}
+                onError={(e) => {
+                  e.target.src = 'https://i.ytimg.com/vi/default.jpg';
+                }}
               />
               <VideoInfo>
                 <Title>{video.snippet.title}</Title>
                 <Channel>{video.snippet.channelTitle}</Channel>
                 <Meta>
                   <span>{video.statistics.viewCount} views</span>
-                  <span>
-                    {new Date(video.snippet.publishedAt).toLocaleDateString()}
-                  </span>
+                  <span>•</span>
+                  <span>{formatDate(video.snippet.publishedAt)}</span>
                 </Meta>
               </VideoInfo>
             </VideoCard>

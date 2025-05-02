@@ -1,31 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import DrawIcon from '@mui/icons-material/Draw';
-
-// Generate mock video data dynamically
-const generateMockVideos = (page, count) => {
-  const videos = [];
-  for (let i = 1; i <= count; i++) {
-    const id = `v${(page - 1) * count + i}`;
-    videos.push({
-      id,
-      snippet: {
-        title: `Memecoin Video #${id}`,
-        channelTitle: `Creator${i % 5 || 1}`,
-        thumbnails: {
-          medium: {
-            url: `https://i.ytimg.com/vi/${['dQw4w9WgXcQ', '9bZkp7q19f0', 'TGjB2D6hQ8U'][i % 3]}/mqdefault.jpg`,
-          },
-        },
-        publishedAt: new Date(2025, 3 - (page % 12), i).toISOString(),
-      },
-      statistics: {
-        viewCount: `${Math.floor(Math.random() * 500) + 50}K`,
-      },
-    });
-  }
-  return videos;
-};
+import VideoData from '../data/VideoData';
 
 const Home = () => {
   const [videos, setVideos] = useState([]);
@@ -33,22 +8,31 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const loaderRef = useRef(null);
 
-  // Simulate API call with mock data
-  const fetchVideos = async (pageNum) => {
+  const fetchVideos = (pageNum) => {
     setIsLoading(true);
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const newVideos = generateMockVideos(pageNum, 12); // Fetch 12 videos per page
-    setVideos((prev) => [...prev, ...newVideos]);
-    setIsLoading(false);
+
+    if (!Array.isArray(VideoData)) {
+      console.error('VideoData is not an array:', VideoData);
+      setIsLoading(false);
+      return;
+    }
+
+    setTimeout(() => {
+      const start = (pageNum - 1) * 12;
+      const end = start + 12;
+      const paginatedVideos = VideoData.slice(start, end);
+
+      if (paginatedVideos.length > 0) {
+        setVideos((prev) => [...prev, ...paginatedVideos]);
+      }
+      setIsLoading(false);
+    }, 500);
   };
 
-  // Initial fetch
   useEffect(() => {
     fetchVideos(page);
   }, []);
 
-  // Infinite scroll observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -71,73 +55,48 @@ const Home = () => {
     };
   }, [isLoading, page]);
 
-  const homeContainerStyle = {
-    padding: '20px',
-    backgroundColor: '#f5f5f5', // Matches body background from your CSS
-    minHeight: '100vh',
-  };
-
-  const videoGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gap: '20px',
-    padding: '0 10px',
-  };
-
-  const videoCardStyle = {
-    backgroundColor: '#ffffff',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    cursor: 'pointer',
-  };
-
-  const thumbnailStyle = {
-    width: '100%',
-    aspectRatio: '16/9',
-    objectFit: 'cover',
-  };
-
-  const videoInfoStyle = {
-    padding: '10px',
-    color: '#000000',
-  };
-
-  const titleStyle = {
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#000000',
-    marginBottom: '5px',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  };
-
-  const channelStyle = {
-    fontSize: '14px',
-    color: '#666666',
-    marginBottom: '5px',
-  };
-
-  const metaStyle = {
-    fontSize: '12px',
-    color: '#888888',
-    display: 'flex',
-    gap: '10px',
-  };
-
-  const loadingStyle = {
-    textAlign: 'center',
-    padding: '20px',
-    color: '#666666',
-    fontSize: '16px',
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   return (
-    <div style={homeContainerStyle}>
-      <div style={videoGridStyle}>
+    <div
+      style={{
+        padding: '20px',
+        minHeight: '100vh',
+        fontFamily: 'var(--font-primary)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 16px 16px',
+          marginBottom: '20px',
+          borderBottom: '1px solid #c8e6c9',
+        }}
+      >
+        <h1
+          style={{
+            fontSize: '24px',
+            fontWeight: '600',
+            color: '#333333',
+            fontFamily: 'var(--font-primary)',
+          }}
+        >
+          NEW VIDEOS
+        </h1>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '20px',
+          padding: '0 10px',
+        }}
+      >
         {videos.map((video) => (
           <Link
             to={`/video/${video.id}`}
@@ -145,36 +104,125 @@ const Home = () => {
             style={{ textDecoration: 'none' }}
           >
             <div
-              style={videoCardStyle}
+              style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.02)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = '0 8px 16px rgba(200, 230, 201, 0.2)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
               }}
             >
-              <img
-                src={video.snippet.thumbnails.medium.url}
-                alt={video.snippet.title}
-                style={thumbnailStyle}
-              />
-              <div style={videoInfoStyle}>
-                <div style={titleStyle}>{video.snippet.title}</div>
-                <div style={channelStyle}>{video.snippet.channelTitle}</div>
-                <div style={metaStyle}>
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: '16/9',
+                  backgroundColor: '#000',
+                  overflow: 'hidden',
+                }}
+              >
+                <img
+                  src={video.snippet.thumbnails.medium.url}
+                  alt={video.snippet.title}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                  onError={(e) => {
+                    e.target.src = 'https://i.ytimg.com/vi/default.jpg';
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '8px',
+                    right: '8px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    color: '#ffffff',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontWeight: '400',
+                    fontFamily: 'var(--font-primary)',
+                  }}
+                >
+                  10:45
+                </div>
+              </div>
+
+              <div style={{ padding: '12px' }}>
+                <div
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: '#333333',
+                    marginBottom: '8px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    lineHeight: '1.4',
+                    height: '44px',
+                    fontFamily: 'var(--font-primary)',
+                  }}
+                >
+                  {video.snippet.title}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: '14px',
+                    color: '#666666',
+                    marginBottom: '4px',
+                    fontWeight: '400',
+                    fontFamily: 'var(--font-primary)',
+                  }}
+                >
+                  {video.snippet.channelTitle}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#666666',
+                    display: 'flex',
+                    gap: '6px',
+                    fontWeight: '400',
+                    fontFamily: 'var(--font-primary)',
+                  }}
+                >
                   <span>{video.statistics.viewCount} views</span>
-                  <span>
-                    {new Date(video.snippet.publishedAt).toLocaleDateString()}
-                  </span>
+                  <span>•</span>
+                  <span>{formatDate(video.snippet.publishedAt)}</span>
                 </div>
               </div>
             </div>
           </Link>
         ))}
       </div>
-      <div ref={loaderRef} style={loadingStyle}>
+
+      <div
+        ref={loaderRef}
+        style={{
+          textAlign: 'center',
+          padding: '30px',
+          color: '#666666',
+          fontSize: '14px',
+          fontWeight: '400',
+          fontFamily: 'var(--font-primary)',
+        }}
+      >
         {isLoading ? 'Loading more videos...' : ''}
       </div>
     </div>

@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/static/css/main.7aa6bc56.css",
-    "main.js": "/static/js/main.6fb56e86.js",
+    "main.js": "/static/js/main.08cc62c9.js",
     "static/media/MedievalSharp-Regular.ttf": "/static/media/MedievalSharp-Regular.5db53ecbc6a66b119952.ttf",
     "index.html": "/index.html",
     "main.7aa6bc56.css.map": "/static/css/main.7aa6bc56.css.map",
-    "main.6fb56e86.js.map": "/static/js/main.6fb56e86.js.map"
+    "main.08cc62c9.js.map": "/static/js/main.08cc62c9.js.map"
   },
   "entrypoints": [
     "static/css/main.7aa6bc56.css",
-    "static/js/main.6fb56e86.js"
+    "static/js/main.08cc62c9.js"
   ]
 }

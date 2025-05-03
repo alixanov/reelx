@@ -374,12 +374,12 @@ const Navigation = () => {
 
   const links = [
     {
-      name: 'Home',
+      name: 'Pope Tube',
       icon: <HomeIcon style={getIconStyle(hoveredLink === 'home')} />,
       to: '/',
     },
     {
-      name: 'Unholy Fire',
+      name: 'Holy leaks',
       icon: <LocalFireDepartmentIcon style={getIconStyle(hoveredLink === 'unholy fire')} />,
       to: '/hot',
     },
@@ -414,7 +414,7 @@ const Navigation = () => {
               filter: `drop-shadow(0 0 2px ${colors.accent.primary})`,
             }}
           />
-          REELX
+          POPE TUBE
         </NavLink>
         <div
           style={searchContainerStyle}
@@ -547,8 +547,7 @@ const Navigation = () => {
                 filter: `drop-shadow(0 0 2px ${colors.accent.primary})`,
               }}
             />
-            REELX CRYPT
-          </div>
+CHOOSE          </div>
         )}
         <ul style={navLinksStyle}>
           {links.map((link) => (

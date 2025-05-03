@@ -10,7 +10,7 @@
 /* Fallback for UnifrakturCook if not locally available */
 @font-face {
   font-family: "UnifrakturCook";
-  src: local("UnifrakturCook"), url("../fonts/UnifrakturCook-Bold.ttf") format("truetype");
+  src: local("UnifrakturCook"), url("../fonts/MedievalSharp-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;

@@ -550,7 +550,7 @@ const Hot = () => {
   return (
     <HotContainer isMobile={isMobile}>
       <HotHeader isMobile={isMobile}>
-        <HotTitle isMobile={isMobile}>UNHOLY FIRE</HotTitle>
+        <HotTitle isMobile={isMobile}>Holy leaks</HotTitle>
         <FilterButtons>
           <FilterButton
             active={filter === 'trending'}
